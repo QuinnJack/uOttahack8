@@ -7,7 +7,12 @@ import {
   Upload01,
   XCircle,
 } from "@untitledui/icons";
-import type { ComponentProps, ComponentPropsWithRef, ReactNode, SVGProps } from "react";
+import type {
+  ComponentProps,
+  ComponentPropsWithRef,
+  ReactNode,
+  SVGProps,
+} from "react";
 import { useId, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/buttons/button";
@@ -113,7 +118,7 @@ interface FileUploadDropZoneProps {
    * the size limit when files are dropped on the drop zone.
    */
   onSizeLimitExceed?: (files: FileList) => void;
-  /** Optional trigger element to support link-based uploads. */
+  /** Optional trigger element to open link-based upload modal. */
   linkTrigger?: ReactNode;
 }
 
@@ -248,11 +253,6 @@ export const FileUploadDropZone = ({
     processFiles(Array.from(event.target.files || []));
   };
 
-  const handleOpenFileDialog = () => {
-    if (isDisabled) return;
-    inputRef.current?.click();
-  };
-
   return (
     <div
       data-dropzone
@@ -269,22 +269,9 @@ export const FileUploadDropZone = ({
         className
       )}
     >
-      <button
-        type="button"
-        onClick={handleOpenFileDialog}
-        disabled={isDisabled}
-        className="rounded-full cursor-grab active:cursor-grabbing active:scale-98 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 disabled:cursor-not-allowed transition-transform duration-150 ease-out ]"
-        aria-label="Upload file"
-      >
-        <FeaturedIcon
-          color="gray"
-          theme="modern"
-          size="md"
-          className="pointer-events-none"
-        >
-          <Upload01 className="size-5" />
-        </FeaturedIcon>
-      </button>
+      <FeaturedIcon color="gray" theme="modern" size="md">
+        <Upload01 className="size-5" />
+      </FeaturedIcon>
 
       <div className="flex flex-col gap-1 text-center">
         <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center">
@@ -298,17 +285,18 @@ export const FileUploadDropZone = ({
             multiple={allowsMultiple}
             onChange={handleInputFileChange}
           />
-          <label htmlFor={id} className="cursor-pointer">
+          <label htmlFor={id} className="">
             <Button
               color="link-color"
               size="md"
               isDisabled={isDisabled}
-              onClick={handleOpenFileDialog}
+              onClick={() => inputRef.current?.click()}
             >
               Click to upload
             </Button>
           </label>
-          <span className="text-sm ">or drag and drop</span>
+          {!isDisabled && linkTrigger}
+          <span className="text-sm max-md:hidden">or drag and drop</span>
         </div>
         <p
           className={cx(
